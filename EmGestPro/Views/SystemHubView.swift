@@ -90,7 +90,7 @@ struct SystemHubView: View {
     private var credits: some View {
         VStack(alignment: .leading, spacing: 8) {
             SectionHeader("Credits")
-            credit("Nouvborne", "EmGestPro developer", "https://github.com/Nouvborne", easterEgg: unlockGoldenK)
+            credit("embabyty", "EmGestPro developer", "https://github.com/embabyty", easterEgg: unlockGoldenK)
             credit("0xjohnnydev", "MobileHouseArrest PoC", "https://github.com/0xjohnnydev")
             credit("forcequitOS", "bad_query", "https://github.com/forcequitOS")
             credit("leminlimez", "Pocket Poster", "https://github.com/leminlimez")

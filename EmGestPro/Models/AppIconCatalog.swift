@@ -45,7 +45,7 @@ enum AppIconCatalog {
     /// `AppIcon.appiconset` / `Logo.imageset` directly rather than the
     /// `<id>` / `<id>Preview` convention scripted alternates follow, and
     /// `setAlternateIconName(nil)` — not its id — is what restores it.
-    static let standard = AppIconOption(id: "AppIcon", title: "Standard", creator: "Nouvborne")
+    static let standard = AppIconOption(id: "AppIcon", title: "Standard", creator: "embabyty")
 
     static let alternates: [AppIconOption] = {
         guard let url = Bundle.main.url(forResource: "AppIcons", withExtension: "json"),
