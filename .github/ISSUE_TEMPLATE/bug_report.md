@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a bug in Ketamine
+about: Report a bug in EmGestPro
 title: "[Bug] "
 labels: bug
 assignees: ""
@@ -13,7 +13,7 @@ assignees: ""
 ## Software
 - iOS Version:
 - Build Number:
-- Ketamine Version:
+- EmGestPro Version:
 
 ## Description
 Describe the issue.

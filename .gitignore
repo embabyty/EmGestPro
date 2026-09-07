@@ -1,0 +1,21 @@
+# Xcode / generated project (this repo uses XcodeGen; the .xcodeproj is generated)
+*.xcodeproj
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+
+# macOS / Finder
+.DS_Store
+
+# Swift / Xcode build artifacts
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.log
+
+# Secrets — never commit real Patreon credentials.
+# PatreonConfig.swift ships with placeholders so the project still builds;
+# if you add a local override, keep it here instead of editing the tracked file.
+*Secrets.swift
+*.secrets.swift

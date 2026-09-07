@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Scaffold a new Ketamine alternate app icon from one source image.
+Scaffold a new EmGestPro alternate app icon from one source image.
 
 Generates the `<id>.appiconset` (home screen icon) and `<id>Preview.imageset`
 (in-app picker thumbnail) asset catalogs, registers `<id>` as an alternate
 icon in Info.plist, and appends {id, title, creator} to
-Ketamine/Resources/AppIcons.json. Nothing else needs to change — the picker
+EmGestPro/Resources/AppIcons.json. Nothing else needs to change — the picker
 UI (AppIconCatalog.swift / AppIconPickerView.swift) reads both at runtime.
 
 Usage:
@@ -123,11 +123,11 @@ def main() -> None:
         fail(f"Id must look like 'AppIconFoo' (got '{icon_id}')")
 
     root = Path(__file__).resolve().parent.parent
-    assets = root / "Ketamine" / "Assets" / "Assets.xcassets"
+    assets = root / "EmGestPro" / "Assets" / "Assets.xcassets"
     icon_set = assets / f"{icon_id}.appiconset"
     preview_set = assets / f"{icon_id}Preview.imageset"
-    info_plist = root / "Ketamine" / "App" / "Info.plist"
-    manifest = root / "Ketamine" / "Resources" / "AppIcons.json"
+    info_plist = root / "EmGestPro" / "App" / "Info.plist"
+    manifest = root / "EmGestPro" / "Resources" / "AppIcons.json"
 
     if icon_set.exists() or preview_set.exists():
         fail(f"{icon_id} already exists in Assets.xcassets")

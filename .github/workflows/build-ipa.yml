@@ -1,0 +1,108 @@
+name: Build IPA
+
+# Builds EmGestPro into a downloadable .ipa you can grab from the Actions
+# tab (or from a GitHub Release when a tag is pushed).
+#
+# Notes:
+#   * The app uses iOS 26 SwiftUI APIs, so the runner must have the iOS 26
+#     SDK (Xcode 26.x). The workflow picks the newest Xcode installed on the
+#     runner automatically.
+#   * The IPA is built UNSIGNED (CODE_SIGNING_ALLOWED=NO) so it can be
+#     installed with TrollStore or sideloading tools. To produce a signed
+#     build, add your certificate/provisioning profile as repository secrets
+#     and drop the CODE_SIGNING_ALLOWED=NO flag.
+#   * Regenerate the Xcode project first (XcodeGen), then build.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [emgestpro, main, master]
+    tags: ['v*']
+
+jobs:
+  build:
+    name: Build unsigned IPA
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # The app needs the iOS 26 SDK, so use the newest Xcode on the runner.
+      - name: Select newest Xcode
+        run: |
+          python3 - <<'PY'
+          import glob, subprocess, re
+          apps = glob.glob('/Applications/Xcode*.app')
+          def ver(p):
+              out = subprocess.run(
+                  ['defaults', 'read', p + '/Contents/Info', 'CFBundleShortVersionString'],
+                  capture_output=True, text=True)
+              return out.stdout.strip() or '0.0'
+          apps.sort(key=lambda a: [int(x) for x in re.findall(r'\d+', ver(a))] or [0])
+          print('Available Xcode versions:')
+          for a in apps:
+              print('  ', ver(a), a)
+          chosen = apps[-1] if apps else ''
+          print('Using:', chosen)
+          with open('/tmp/xcode_path.txt', 'w') as f:
+              f.write(chosen)
+          PY
+          XCODE=$(cat /tmp/xcode_path.txt)
+          if [ -n "$XCODE" ]; then
+            sudo xcode-select -s "$XCODE"
+          fi
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Build unsigned IPA (device)
+        run: |
+          set -o pipefail
+          xcodebuild -project EmGestPro.xcodeproj \
+            -scheme EmGestPro \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package IPA
+        run: |
+          APP=$(find build/Build/Products -name "EmGestPro.app" -maxdepth 5 -print -quit)
+          if [ -z "$APP" ]; then
+            echo "::error::EmGestPro.app not found in build products."
+            exit 1
+          fi
+          echo "Found app at: $APP"
+          rm -rf Payload
+          mkdir -p Payload
+          cp -R "$APP" Payload/
+          ditto -c -k --sequesterRsrc --keepParent Payload EmGestPro.ipa
+          shasum -a 256 EmGestPro.ipa > EmGestPro.ipa.sha256
+          ls -lh EmGestPro.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EmGestPro-ipa
+          path: EmGestPro.ipa
+          if-no-files-found: error
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            EmGestPro.ipa
+            EmGestPro.ipa.sha256
+          generate_release_notes: true

@@ -1,4 +1,4 @@
-name: Ketamine
+name: EmGestPro
 options:
   minimumXcodeGenVersion: 2.35.0
   deploymentTarget:
@@ -24,21 +24,21 @@ settings:
     CLANG_ENABLE_OBJC_ARC: YES
 
 targets:
-  Ketamine:
+  EmGestPro:
     type: application
     platform: iOS
     sources:
-      - path: Ketamine
+      - path: EmGestPro
         excludes:
-          - "Exploit/Ketamine-Bridging-Header.h"
+          - "Exploit/EmGestPro-Bridging-Header.h"
     dependencies:
       - package: ZIPFoundation
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: uk.nouvborne.ketamine
-        PRODUCT_NAME: Ketamine
-        INFOPLIST_FILE: Ketamine/App/Info.plist
-        SWIFT_OBJC_BRIDGING_HEADER: Ketamine/Exploit/Ketamine-Bridging-Header.h
+        PRODUCT_NAME: EmGestPro
+        INFOPLIST_FILE: EmGestPro/App/Info.plist
+        SWIFT_OBJC_BRIDGING_HEADER: EmGestPro/Exploit/EmGestPro-Bridging-Header.h
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
