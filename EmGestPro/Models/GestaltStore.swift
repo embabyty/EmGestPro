@@ -378,6 +378,21 @@ final class GestaltStore: ObservableObject {
             throw ApplyError.writeVerificationFailed
         }
 
+        // OTA Blocker additionally disables the OTA update daemons through
+        // launchd's disabled.plist via bad_query. Runs only after the
+        // MobileGestalt write verified, so a failed cache write never leaves
+        // launchd half-modified. Toggling the tweak off and applying again
+        // removes the entries (re-enables updates). Failures are warnings —
+        // the exploit route may be unavailable on some firmware.
+        if ids == nil || ids!.contains("ota-blocker") {
+            let blocker = tweaks.first { $0.id == "ota-blocker" }
+            do {
+                try LaunchDaemonsManager.setOTABlocked(blocker?.isEnabled ?? false)
+            } catch {
+                warnings.append("OTA Blocker: could not update launchd disabled.plist (\(error.localizedDescription)).")
+            }
+        }
+
         let result = ApplyResult(
             appliedCount: applied,
             warnings: warnings,

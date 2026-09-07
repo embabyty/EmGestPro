@@ -199,5 +199,20 @@ enum SystemTweaks {
                                     subkey: nil, value: .int(1))
             ]
         ),
+        Tweak(
+            id: "ota-blocker",
+            title: "OTA Blocker",
+            subtitle: "Block over-the-air software updates.",
+            category: .system,
+            symbol: "arrow.down.to.line",
+            isRisky: true,
+            notes: "Disables the OTA update daemons (softwareupdated, OTATaskingAgent, softwareupdateservicesd, NRDUpdated) via launchd's disabled.plist using bad_query, and marks the device as already badged so no update prompt appears. Toggling off and applying again re-enables the daemons.",
+            modifications: [
+                GestaltModification(key: "xjaisie76xsb8zhbUdSVYA", // BadgedForSoftwareUpdateJumpOnceKey
+                                    subkey: nil, value: .int(1)),
+                GestaltModification(key: "lluiGHXtXLV8sHqpMTqiJw", // BadgedForSoftwareUpdateKey
+                                    subkey: nil, value: .int(1)),
+            ]
+        ),
     ]
 }
