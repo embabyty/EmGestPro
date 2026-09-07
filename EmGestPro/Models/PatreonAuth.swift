@@ -279,13 +279,19 @@ final class PatreonAuth: ObservableObject {
 // MARK: - Decoding models
 
 private struct Token: Decodable {
-    let access_token: String
-    let refresh_token: String?
-    let expires_in: Int?
+    let accessToken: String
+    let refreshToken: String?
+    let expiresIn: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case accessToken = "access_token"
+        case refreshToken = "refresh_token"
+        case expiresIn = "expires_in"
+    }
 }
 
 private struct MembershipInfo {
-    let tier: String?
+    var tier: String?
     let fullName: String?
     let email: String?
 }
