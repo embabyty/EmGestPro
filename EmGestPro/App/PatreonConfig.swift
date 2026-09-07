@@ -11,20 +11,25 @@
 //    2. Add `https://embabyty.github.io/EmGestPro/patreon-callback.html`
 //       to the client's allowed redirect URIs, and enable the v2 scopes:
 //       `identity`, `identity[email]`, `identity.memberships`.
-//    3. Paste the Client ID and Client Secret into `clientID` / `clientSecret`
-//       below.
+//    3. Put the Client ID and Client Secret into your local `.env` file
+//       (`PATREON_CLIENT_ID` / `PATREON_CLIENT_SECRET`); the pre-build phase
+//       injects them into the gitignored PatreonSecrets.swift.
 //
 //  IMPORTANT: never commit your real Client Secret to a public repository.
-//  This file ships with placeholder values so the project still builds; fill
-//  them in locally before distributing a build.
+//  This repo ships with placeholder values (via scripts/generate_secrets.sh)
+//  so the project still builds; fill in `.env` locally before distributing a
+//  build.
 //
 
 import Foundation
 
 enum PatreonConfig {
-    // Fill these in with the values from your Patreon client.
-    static let clientID = "YOUR_PATREON_CLIENT_ID"
-    static let clientSecret = "YOUR_PATREON_CLIENT_SECRET"
+    /// The Patreon v2 OAuth client credentials. Read from the local .env file
+    /// via the gitignored PatreonSecrets.swift (see scripts/generate_secrets.sh)
+    /// so real secrets are never committed. Without .env values they fall back
+    /// to placeholders and `isConfigured` is false.
+    static var clientID: String { PatreonSecrets.clientID }
+    static var clientSecret: String { PatreonSecrets.clientSecret }
 
     /// The custom URL scheme used to hand the OAuth redirect back to the app.
     /// Must be registered in Info.plist. Patreon only accepts http(s) redirect

@@ -52,9 +52,7 @@ having an **active EAF Ultra membership** on the
 
 ### Setting up your Patreon credentials (creator)
 
-The paywall ships with placeholder credentials in
-[`EmGestPro/App/PatreonConfig.swift`](EmGestPro/App/PatreonConfig.swift). To make
-the login work:
+The paywall ships with placeholder credentials. To make the login work:
 
 1. Create a **Patreon v2 client** at
    [https://www.patreon.com/portal/registration/register-clients](https://www.patreon.com/portal/registration/register-clients)
@@ -66,12 +64,20 @@ the login work:
    **GitHub Pages** enabled on the repo: **Settings → Pages → Deploy from a
    branch → `master` → `/docs`**.
 3. Enable the v2 scopes: `identity`, `identity[email]` and `identity.memberships`.
-4. Paste your **Client ID** and **Client Secret** into `PatreonConfig.swift`.
+4. Create a `.env` file in the repo root (gitignored) with your client
+   credentials:
+   ```bash
+   PATREON_CLIENT_ID=your_client_id
+   PATREON_CLIENT_SECRET=your_client_secret
+   ```
 5. Set `ultraTierTitle` to the exact name of your EAF Ultra tier (default `EAF Ultra`).
 
-> ⚠️ **Never commit your real Client Secret.** `PatreonConfig.swift` is tracked
-> with placeholders so the project still builds; fill in your own values locally
-> before distributing a build.
+> ⚠️ **Never commit your real Client Secret.** Credentials live in the
+> gitignored `.env`; the **"Generate Patreon Secrets"** pre-build phase injects
+> them into the gitignored
+> [`EmGestPro/App/PatreonSecrets.swift`](EmGestPro/App/PatreonSecrets.swift)
+> every time you build. Without `.env` values the project still builds but the
+> paywall sign-in is disabled.
 
 ### Creator auto-unlock (owner bypass)
 
