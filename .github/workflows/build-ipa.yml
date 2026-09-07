@@ -29,6 +29,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Inject creator secrets (.env) if a PATREON_OWNER_EMAIL repository secret
+      # is set, then generate the gitignored PatreonSecrets.swift the app
+      # compiles against. Without the secret, a placeholder is written and the
+      # creator auto-unlock is simply disabled in the build.
+      - name: Prepare Patreon secrets
+        env:
+          PATREON_OWNER_EMAIL: ${{ secrets.PATREON_OWNER_EMAIL }}
+        run: |
+          if [ -n "${PATREON_OWNER_EMAIL:-}" ]; then
+            printf 'PATREON_OWNER_EMAIL=%s\n' "$PATREON_OWNER_EMAIL" > .env
+          fi
+          scripts/generate_secrets.sh
+
       # The app needs the iOS 26 SDK, so use the newest Xcode on the runner.
       - name: Select newest Xcode
         run: |

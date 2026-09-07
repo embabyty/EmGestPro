@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EmGestPro Sign-In</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 36em; margin: 4em auto; color: #333; line-height: 1.5; }
+    a { color: #1a73e8; }
+  </style>
+</head>
+<body>
+  <h1>EmGestPro Sign-In</h1>
+  <p id="msg">Completing sign-in…</p>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var code = params.get("code");
+      var state = params.get("state");
+
+      // Forward the OAuth response back to the app's custom URL scheme.
+      // Patreon only accepts http(s) redirect URIs, so this page is the
+      // registered redirect URI and hands the code to `emgestpro://...`.
+      if (code) {
+        var target = "emgestpro://patreon-callback";
+        var query = ["code=" + encodeURIComponent(code)];
+        if (state) query.push("state=" + encodeURIComponent(state));
+        target += "?" + query.join("&");
+
+        window.location.replace(target);
+
+        // Fallback in case the browser blocks the custom-scheme navigation.
+        setTimeout(function () {
+          document.getElementById("msg").innerHTML =
+            'If EmGestPro didn\'t open automatically, tap to continue: ' +
+            '<a href="' + target + '">Open EmGestPro</a>';
+        }, 1500);
+      } else {
+        document.getElementById("msg").textContent =
+          "No authorization code was received. Please close this page and try signing in again.";
+      }
+    })();
+  </script>
+</body>
+</html>

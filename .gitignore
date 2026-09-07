@@ -19,3 +19,9 @@ xcuserdata/
 # if you add a local override, keep it here instead of editing the tracked file.
 *Secrets.swift
 *.secrets.swift
+
+# Local environment secrets — source of truth for the generated
+# EmGestPro/App/PatreonSecrets.swift (see scripts/generate_secrets.sh).
+.env
+.env.*
+!.env.example

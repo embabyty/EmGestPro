@@ -49,3 +49,8 @@ targets:
     scheme:
       gatherCoverageData: false
       testTargets: []
+    preBuildScripts:
+      - name: Generate Patreon Secrets
+        script: |
+          bash "${SRCROOT}/scripts/generate_secrets.sh"
+        basedOnDependencyAnalysis: false

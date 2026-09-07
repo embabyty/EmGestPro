@@ -8,8 +8,8 @@
 //    1. Create a Patreon v2 client at:
 //       https://www.patreon.com/portal/registration/register-clients
 //       (sign in with your creator account — EmAppleFlagship).
-//    2. Add `emgestpro://patreon-callback` to the client's allowed
-//       redirect URIs, and enable the v2 scopes:
+//    2. Add `https://embabyty.github.io/EmGestPro/patreon-callback.html`
+//       to the client's allowed redirect URIs, and enable the v2 scopes:
 //       `identity`, `identity[email]`, `identity.memberships`.
 //    3. Paste the Client ID and Client Secret into `clientID` / `clientSecret`
 //       below.
@@ -27,9 +27,12 @@ enum PatreonConfig {
     static let clientSecret = "YOUR_PATREON_CLIENT_SECRET"
 
     /// The custom URL scheme used to hand the OAuth redirect back to the app.
-    /// Must be registered in Info.plist and match the client's redirect URI.
+    /// Must be registered in Info.plist. Patreon only accepts http(s) redirect
+    /// URIs, so the registered redirect URI (below) is the GitHub Pages bridge
+    /// page `docs/patreon-callback.html`, which forwards the OAuth code to
+    /// this scheme; the app's callback then arrives at `emgestpro://...`.
     static let redirectScheme = "emgestpro"
-    static let redirectURI = "emgestpro://patreon-callback"
+    static let redirectURI = "https://embabyty.github.io/EmGestPro/patreon-callback.html"
 
     static let authorizeURL = "https://www.patreon.com/oauth2/authorize"
     static let tokenURL = "https://www.patreon.com/api/oauth2/token"
@@ -41,8 +44,15 @@ enum PatreonConfig {
     /// The exact tier title required to unlock the app.
     static let ultraTierTitle = "EAF Ultra"
 
-    /// OAuth scopes needed to read the user's identity and memberships.
-    static let scopes = "identity identity.memberships"
+    /// The EmAppleFlagship campaign owner's Patreon email (from the local .env
+    /// file, injected at build time into the gitignored PatreonSecrets.swift).
+    /// When a signed-in user's email matches, EmGestPro Ultra unlocks
+    /// automatically without requiring an active EAF Ultra membership. Empty
+    /// means the creator auto-unlock is disabled.
+    static var ownerEmail: String { PatreonSecrets.ownerEmail }
+
+    /// OAuth scopes needed to read the user's identity, email and memberships.
+    static let scopes = "identity identity.memberships identity[email]"
 
     /// How long a verified session stays unlocked without re-verifying.
     static let sessionDays: Int = 7

@@ -93,7 +93,7 @@ final class PatreonAuth: ObservableObject {
 
         do {
             let info = try await fetchMembership(accessToken: token)
-            if info.tier != PatreonConfig.ultraTierTitle {
+            if !isEntitled(info) {
                 lockOut()
             }
         } catch PatreonAuthError.unauthorized {
@@ -101,7 +101,7 @@ final class PatreonAuth: ObservableObject {
             do {
                 let fresh = try await refreshAccessToken()
                 let info = try await fetchMembership(accessToken: fresh)
-                if info.tier != PatreonConfig.ultraTierTitle {
+                if !isEntitled(info) {
                     lockOut()
                 }
             } catch {
@@ -161,7 +161,7 @@ final class PatreonAuth: ObservableObject {
 
     private func verifyAndUnlock(_ token: Token) async throws {
         let info = try await fetchMembership(accessToken: token.accessToken)
-        guard info.tier == PatreonConfig.ultraTierTitle else {
+        guard isEntitled(info) else {
             throw PatreonAuthError.notSubscribed
         }
         defaults.set(token.accessToken, forKey: Keys.accessToken)
@@ -176,13 +176,24 @@ final class PatreonAuth: ObservableObject {
         isUnlocked = true
     }
 
+    /// True when the signed-in account is entitled to EmGestPro Ultra: either
+    /// it holds an active EAF Ultra membership, or it is the EmAppleFlagship
+    /// campaign owner's account (creator auto-unlock from .env).
+    private func isEntitled(_ info: MembershipInfo) -> Bool {
+        if info.tier == PatreonConfig.ultraTierTitle { return true }
+        let owner = PatreonConfig.ownerEmail.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !owner.isEmpty, let email = info.email else { return false }
+        return email.trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased() == owner.lowercased()
+    }
+
     private func fetchMembership(accessToken: String) async throws -> MembershipInfo {
         guard var components = URLComponents(string: PatreonConfig.identityURL) else {
             throw PatreonAuthError.network("Invalid Patreon identity URL.")
         }
         components.queryItems = [
             URLQueryItem(name: "include", value: "memberships,memberships.currently_entitled_tiers"),
-            URLQueryItem(name: "fields[user]", value: "full_name"),
+            URLQueryItem(name: "fields[user]", value: "full_name,email"),
             URLQueryItem(name: "fields[member]", value: "patron_status"),
             URLQueryItem(name: "fields[tier]", value: "title")
         ]

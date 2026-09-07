@@ -59,14 +59,49 @@ the login work:
 1. Create a **Patreon v2 client** at
    [https://www.patreon.com/portal/registration/register-clients](https://www.patreon.com/portal/registration/register-clients)
    while signed in with your creator account.
-2. Add `emgestpro://patreon-callback` as an allowed redirect URI.
-3. Enable the v2 scopes: `identity` and `identity.memberships`.
+2. Add `https://embabyty.github.io/EmGestPro/patreon-callback.html` as a
+   redirect URI. Patreon only accepts http(s) URIs, so this is a small
+   GitHub Pages page ([`docs/patreon-callback.html`](docs/patreon-callback.html))
+   that forwards the OAuth code to the app's `emgestpro://` scheme. It needs
+   **GitHub Pages** enabled on the repo: **Settings → Pages → Deploy from a
+   branch → `master` → `/docs`**.
+3. Enable the v2 scopes: `identity`, `identity[email]` and `identity.memberships`.
 4. Paste your **Client ID** and **Client Secret** into `PatreonConfig.swift`.
 5. Set `ultraTierTitle` to the exact name of your EAF Ultra tier (default `EAF Ultra`).
 
 > ⚠️ **Never commit your real Client Secret.** `PatreonConfig.swift` is tracked
 > with placeholders so the project still builds; fill in your own values locally
 > before distributing a build.
+
+### Creator auto-unlock (owner bypass)
+
+As the **EmAppleFlagship campaign owner** you can make the app unlock
+automatically for your own Patreon account, without needing an active pledge
+on the EAF Ultra tier:
+
+1. Create a `.env` file in the repo root (gitignored) with your creator email:
+   ```bash
+   PATREON_OWNER_EMAIL=you@example.com
+   ```
+2. The **"Generate Patreon Secrets"** pre-build phase turns that into the
+   gitignored [`EmGestPro/App/PatreonSecrets.swift`](EmGestPro/App/PatreonSecrets.swift)
+   every time you build. You can also run it manually:
+   ```bash
+   scripts/generate_secrets.sh
+   ```
+3. Sign in with Patreon using that account — the app unlocks immediately, no
+   membership check, and stays unlocked on revalidation.
+
+Details:
+
+- The email is compiled into the app at build time, so it only affects builds
+  made on a machine (or CI run) that had the `.env` present. If the file is
+  missing or the key is empty, the bypass is disabled.
+- Builds through GitHub Actions don't see your local `.env`. To unlock
+  CI-built IPAs too, set a **`PATREON_OWNER_EMAIL` repository secret** — the
+  workflow injects it automatically.
+- The check requires the `identity[email]` scope, which is already requested
+  by `PatreonConfig.scopes`.
 
 ### Regenerating the project
 
@@ -101,6 +136,14 @@ repo.
 Need help, want to report a bug, or want to share your results?
 
 **Join the [EmGestPro Discord](https://discord.gg/Wt8dj8E8ZN).**
+
+## Privacy Policy
+
+See [PRIVACY.md](PRIVACY.md) for details on how EmGestPro handles your data.
+
+## Terms of Service
+
+See [TERMS.md](TERMS.md) for the terms governing your use of EmGestPro.
 
 ## Credits
 
